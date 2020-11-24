@@ -1,0 +1,280 @@
+
+#include <windows.h>
+#include <stdlib.h>
+#include <math.h>
+#include <GL\gl.h>
+#include <GL\glu.h>
+#include <GL\glut.h>
+
+#define SCREEN_WIDTH 900
+#define SCREEN_HEIGHT 900
+#define PI 3.1415926535897932384626433832795
+#define FPS 30
+
+int X = 0;
+int Y = 0;
+
+void rectangle(int x, int y, int w, int h) {
+	glBegin(GL_POLYGON);
+	glVertex2d(x, y);
+	glVertex2d(x + w, y);
+	glVertex2d(x + w, y + h);
+	glVertex2d(x, y + h);
+	glEnd();
+}
+
+void circle(int cx, int cy, int r, int n) {
+	double inc = (2 * PI) / n;
+	glBegin(GL_POLYGON);
+	for (double theta = 0.0; theta <= 2 * PI; theta += inc) {
+		glVertex2d(r * cos(theta) + cx, r * sin(theta) + cy);
+	}
+	glEnd();
+}
+
+void triangle(int x, int y, int w, int h) {
+	glBegin(GL_POLYGON);
+	glVertex2d(x, y); //point kiri
+	glVertex2d(x + w, y); //point kanan
+	glVertex2d(x + (w / 2), y + h); //top y tajam
+	glEnd();
+}
+/*
+void house(int x, int y, int w) {
+	double h = w * (2.0 / 3.0);
+	// draw body
+	glColor3ub(102, 0, 204);
+	rectangle(x, y, w, h);
+	// draw door
+	glColor3ub(255, 153, 104);
+	rectangle(x + w / 2 - w * 0.1, y, w * 0.2, w * (2.0 / 6.0));
+	//door knob
+	glColor3ub(102, 0, 51);
+	circle(370, 250, 5, 100);
+	// draw left window
+	glColor3ub(255, 204, 153);
+	rectangle(x + w * 0.125, y + w * (2.0 / 6.0), w * (2.0 / 9.0), w * (2.0 / 9.0));
+	glColor3ub(102, 0, 51);
+	rectangle(x + w * 0.125, y + w * (2.0 / 6.0), w * (0.1 / 9.0), w * (2.0 / 9.0));
+	rectangle(x + w * 0.235, y + w * (2.0 / 6.0), w * (0.1 / 9.0), w * (2.0 / 9.0));
+	rectangle(x + w * 0.335, y + w * (2.0 / 6.0), w * (0.1 / 9.0), w * (2.0 / 9.0));
+	rectangle(x + w * 0.125, y + w * (2.0 / 6.0), w * (2.0 / 9.0), w * (0.1 / 9.0));
+	rectangle(x + w * 0.125, y + w * (2.6 / 6.0), w * (2.0 / 9.0), w * (0.1 / 9.0));
+	rectangle(x + w * 0.125, y + w * (3.3 / 6.0), w * (2.0 / 9.0), w * (0.1 / 9.0));
+	// draw right window
+	glColor3ub(255, 204, 153);
+	rectangle(x + w - (w * 0.125) - w * (2.0 / 9.0), y + w * (2.0 / 6.0), w * (2.0 / 9.0), w * (2.0 / 9.0));
+	glColor3ub(102, 0, 51);
+	rectangle(x + w - (w * 0.125) - w * (2.0 / 9.0), y + w * (2.0 / 6.0), w * (0.1 / 9.0), w * (2.0 / 9.0));
+	rectangle(x + w - (w * 0.022) - w * (2.0 / 9.0), y + w * (2.0 / 6.0), w * (0.1 / 9.0), w * (2.0 / 9.0));
+	rectangle(x + w - (w * (-0.085)) - w * (2.0 / 9.0), y + w * (2.0 / 6.0), w * (0.1 / 9.0), w * (2.0 / 9.0));
+	rectangle(x + w - (w * 0.125) - w * (2.0 / 9.0), y + w * (2.0 / 6.0), w * (2.0 / 9.0), w * (0.1 / 9.0));
+	rectangle(x + w - (w * 0.125) - w * (2.0 / 9.0), y + w * (2.6 / 6.0), w * (2.0 / 9.0), w * (0.1 / 9.0));
+	rectangle(x + w - (w * 0.125) - w * (2.0 / 9.0), y + w * (3.3 / 6.0), w * (2.0 / 9.0), w * (0.1 / 9.0));
+	// draw roof
+	glColor3ub(128, 0, 0);
+	glBegin(GL_POLYGON);
+	glVertex2d(x - (w / 6.0), y + h);
+	glVertex2d(x + w + (w / 6.0), y + h);
+	glVertex2d(x + w, y + h + (h / 3.0));
+	glVertex2d(x, y + h + (h / 3.0));
+	glEnd();
+}
+*/
+void sun(int x, int y, int r) {
+	glColor3ub(255, 250, 0);
+	circle(x, y, r, 100);
+
+	circle(x + r, y + r, r / 4, 100);
+	circle(x - r, y - r, r / 4, 100);
+
+	circle(x + r, y - r, r / 4, 100);
+	circle(x - r, y + r, r / 4, 100);
+
+	circle(x + (r * 1.3), y, r / 4, 100);
+	circle(x - (r * 1.3), y, r / 4, 100);
+
+	circle(x, y + (r * 1.3), r / 4, 100);
+	circle(x, y - (r * 1.3), r / 4, 100);
+}
+
+void ground(int x, int y, int w, int h) {
+	/*// grass
+	glColor3ub(0, 204, 15);
+	rectangle(x, y, w, h);
+	glColor3ub(51, 102, 0);
+	// left rumput panjang 1
+	triangle(100, 200, 10, 10);
+	triangle(105, 200, 10, 10);
+	triangle(110, 200, 10, 10);
+	//left rumput panjang 2
+	triangle(120, 300, 10, 10);
+	triangle(125, 300, 10, 10);
+	triangle(130, 300, 10, 10);
+	//right rumput panjang 3
+	triangle(800, 200, 10, 10);
+	triangle(805, 200, 10, 10);
+	triangle(810, 200, 10, 10);
+	//right rumput panjang 4
+	triangle(850, 350, 10, 10);
+	triangle(855, 350, 10, 10);
+	triangle(860, 350, 10, 10);
+	//right rumput panjang 5
+	triangle(700, 300, 10, 10);
+	triangle(705, 300, 10, 10);
+	triangle(710, 300, 10, 10);
+	//right rumput panjang 6
+	triangle(400, 200, 10, 10);
+	triangle(405, 200, 10, 10);
+	triangle(410, 200, 10, 10);
+	//right rumput panjang 7
+	triangle(350, 350, 10, 10);
+	triangle(355, 350, 10, 10);
+	triangle(360, 350, 10, 10);
+
+	// road @ walking path
+	glColor3ub(128, 128, 128);
+	rectangle(x, y + 50, w, h / 3);
+
+	//hills @ mountain
+	glColor3ub(255, 153, 51);
+	triangle(x, y + h, 400, 400);
+	triangle(x + 300, y + h, 400, 400);
+	triangle(x + 600, y + h, 400, 400);
+	*/
+}
+void background(int x, int y, int w, int h) {
+	glColor3ub(69, 169, 169);
+	rectangle(x, y, w, h);
+}
+/*void sky(int x, int y, int w, int h) {
+	//blue sky
+	glColor3ub(50, 250, 255);
+	rectangle(x, y, w, h);
+}*/
+
+void cloud() {
+	//cloud
+	glColor3ub(204, 255, 255); //color
+	//cloud 1
+	circle(300, 800, 30, 100);
+	circle(300 + 40, 800, 30, 100);
+	circle(300 + 80, 800, 30, 100);
+	//cloud 2
+	circle(100, 700, 30, 100);
+	circle(100 + 40, 700, 30, 100);
+	circle(100 + 80, 700, 30, 100);
+	//cloud 3
+	circle(750, 750, 30, 100);
+	circle(750 + 40, 750, 30, 100);
+	circle(750 + 80, 750, 30, 100);
+	//cloud 4
+	circle(550, 650, 30, 100);
+	circle(550 + 40, 650, 30, 100);
+	circle(550 + 80, 650, 30, 100);
+}
+
+/*void tree() {
+	glColor3ub(51, 25, 0);
+	rectangle(75, 300, 40, 80);
+
+	glColor3ub(178, 255, 102);
+	triangle(50, 550, 100, 80); //top
+	triangle(40, 520, 120, 80);
+	triangle(30, 490, 140, 80);
+	triangle(20, 460, 160, 80);
+	triangle(10, 420, 180, 80);
+	triangle(0, 380, 200, 80);
+}
+
+void stone() {
+	glColor3ub(32, 32, 32);
+	rectangle(550, 120, 25, 30);
+}
+
+void bench(int x, int y, int w, int h) {
+
+	glColor3ub(51, 25, 0);
+	rectangle(x, 190, 5, 60);
+	rectangle(x + (w - 5), 190, 5, 60);
+	rectangle(x + (w - 30), y - 35, 5, 60);
+	rectangle(x + 30, y - 35, 5, 60);
+
+	rectangle(x + 40, y + h, 10, h);
+	rectangle(x + (w - 50), y + h, 10, h);
+
+	glColor3ub(153, 76, 0);
+	rectangle(x + 30, y + 100, w - 60, h + 30);
+
+	glBegin(GL_POLYGON);
+	glVertex2d(x, y);
+	glVertex2d(x + w, y);
+	glVertex2d(x + (w - 30), y + h);
+	glVertex2d(x + 30, y + h);
+	glEnd();
+}
+*/
+void L_Mouth(int x, int y, int w, int h) {
+	//Levi's mouth
+	glColor3ub(139, 69, 19);
+	rectangle(x + 60,450, 80, 150);
+	glColor3ub(255, 255, 255);
+	rectangle(x + 70, 570, 20, 30);
+	rectangle(x +100, 570, 20, 30);
+
+	glColor3ub(139, 69, 19);
+	rectangle(x + 60, 200, 80, 150);
+	glColor3ub(255, 255, 255);
+	rectangle(x + 70, 320, 20, 30);
+	
+	
+	//glColor3ub(255, 255, 255);
+	//rectangle(x + h + 10, 400, 60, 70);
+
+}
+void display() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	glPointSize(10.0);
+
+	// set x, y, width, height
+	background(500, 0, 500, 0);
+	//sky(0, 0, 1000, 1000);
+	//ground(0, 0, 1000, 400);
+
+	//cloud();
+
+	// set center(x,y) , radian
+	//sun(600, 800, 50);
+
+	// set x, y, width
+//	house(200, 200, 400);
+
+	/*tree();
+
+	bench(350, 250, 350, 50);
+
+	stone();*/
+	L_Mouth(350, 250, 350, 50);
+
+	glFlush();
+	glutSwapBuffers();
+}
+
+void initGL() {
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT);
+}
+
+int main(int argc, char** argv) {
+	glutInitDisplayMode(GLUT_DOUBLE);
+	glutInit(&argc, argv);
+	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	glutCreateWindow("House"); // Set window title
+	glutDisplayFunc(display);
+	initGL();
+	glutMainLoop();
+}
+
+
